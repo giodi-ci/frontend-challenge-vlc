@@ -43,7 +43,8 @@
               <div class="field">
                 <label for="collateral">Collateral</label>
                 <select name="collateral" id="collateral" required>
-                  <option value="vehicle">Vehicle</option>
+                  <option value="vehicle" selected="selected">Vehicle</option>
+                  <option value="home">Home</option>
                 </select>
               </div>
             </div>
@@ -56,8 +57,8 @@
                 <div class="range">
                   <input type="range" name="collateral-value-range" id="collateral-value-range" min="0" max="100" value="20" step="10">
                   <div class="range__values">
-                    <span>12.000</span>
-                    <span>24.000</span>
+                    <span id="collateral-minimum">12.000</span>
+                    <span id="collateral-maximum">24.000</span>
                   </div>
                 </div>
               </div>
@@ -71,8 +72,8 @@
                 <div class="range">
                   <input type="range" name="loan-amount-range" id="loan-amount-range" min="0" max="100" value="90" step="10">
                   <div class="range__values">
-                    <span>30.000</span>
-                    <span>60.000</span>
+                    <span id="loan-minimum">30.000</span>
+                    <span id="loan-maximum">60.000</span>
                   </div>
                 </div>
               </div>
@@ -84,16 +85,16 @@
               <h2>Monthly installment</h2>
               <div class="quota">
                 <strong>R$</strong>
-                <span>465,00</span>
+                <span id="monthly-result">465,00</span>
               </div>
             </div>
             <div class="amount_container">
               <h3>Total payable</h3>
-              <p>R$ 11.112,00</p>
+              <p>R$ <span id="total-payable">11.112,00</span></p>
             </div>
             <div class="tax__container">
               <h3>Interest rate (month)</h3>
-              <p>111,12%</p>
+              <p id="interest-rate">111,12%</p>
             </div>
             <button class="button">
               Request
