@@ -16,6 +16,7 @@ module.exports = {
       myPageHeader: 'Creditas Challenge',
       template: 'public/index.html',
       filename: 'index.html',
+      favicon: 'public/favicon.png',
       files: {
         css: ['style.css']
       }
