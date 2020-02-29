@@ -1,7 +1,7 @@
 import './styles.css'
 import data from './../data/data.json'
 
-import { rangePercent, totalPayable, monthlyInstallment, checkInput } from './helper'
+import { rangePercent, inputPercent, totalPayable, monthlyInstallment, checkInput } from './helper'
 
 // TODO: move this to a constructor?
 const assetOption = document.getElementById('collateral')
@@ -26,11 +26,17 @@ export function getUserSelection (element) {
   return element.options[selectedIndex].value
 }
 
-export function inputChecker (input) {
+export function inputChecker (input, minimum, maximum) {
   const inputIsANumber = checkInput(input.value)
-  inputIsANumber ? input.className = '' : input.className = 'js-value-incorrect'
+  let rangePercent
 
-  return inputIsANumber
+  if (inputIsANumber) {
+    rangePercent = inputPercent(minimum, maximum, input.value)
+  }
+
+  inputIsANumber && rangePercent >= 0 ? input.className = '' : input.className = 'js-value-incorrect'
+
+  return { inputIsANumber, rangePercent }
 }
 
 export function getAssetData () {
@@ -105,10 +111,13 @@ export function handleChangeRangeWarranty (
   })
 
   assetWarrantyInput.addEventListener('input', (e) => {
-    if (inputChecker(e.target)) {
-      // TODO: update range percent
+    const { minimum, maximum } = getAssetData().collateral
+    const { inputIsANumber, rangePercent } = inputChecker(e.target, minimum, maximum)
+
+    if (inputIsANumber) {
+      assetWarrantyRange.value = rangePercent
     }
-  }) 
+  })
 }
 
 export function handleChangeLoanAmount (
@@ -117,13 +126,15 @@ export function handleChangeLoanAmount (
 ) {
   loanAmountRangeElement.addEventListener('change', function (event) {
     const { minimum, maximum } = getAssetData().loan
-    // TODO: loan max value shouldn't be > collateral value
     loanAmountElement.value = rangePercent(minimum, maximum, event.target.value)
   })
 
   loanAmountElement.addEventListener('input', (e) => {
-    if (inputChecker(e.target)) {
-      // TODO: update range percent
+    const { minimum, maximum } = getAssetData().loan
+    const { inputIsANumber, rangePercent } = inputChecker(e.target, minimum, maximum)
+
+    if (inputIsANumber) {
+      loanAmountRangeElement.value = rangePercent
     }
   })
 }
@@ -169,7 +180,7 @@ export default class CreditasChallenge {
     this.elementsInitialValues()
     this.registerEvents()
   }
-  
+
   static elementsInitialValues () {
     interestRate.innerText = `${data.rules.interest}%`
     collateralMinimum.innerText = getAssetData().collateral.minimum
@@ -180,9 +191,8 @@ export default class CreditasChallenge {
   }
 
   static registerEvents () {
-    // TODO: double check submit function
     Submit(document.querySelector('.form'))
-    
+
     // TODO: implement Help response
     Help(document.getElementById('help'))
 
