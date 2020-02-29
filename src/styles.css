@@ -11,6 +11,7 @@
   --white: #fff;
   --silver: #ccc;
   --tom-thumb: #2a492f;
+  --red: #c6868a;
   --header: 80px;
   --footer: 30px;
 }
@@ -117,8 +118,7 @@ strong {
 
 /* Main Section */
 .main {
-  width: 50%;
-  max-width: 50%;
+  width: 600px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -147,6 +147,7 @@ strong {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 330px;
 }
 
 .field-group {
@@ -208,7 +209,7 @@ strong {
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
-  min-width: 35%;
+  min-width: 220px;
   margin-left: 5%;
   text-align: center;
 }
@@ -251,6 +252,47 @@ strong {
   text-align: center;
 }
 
+/* State */
+.field input[type="text"].js-value-incorrect {
+  border: 1px solid var(--red);
+  outline: none;
+}
+
+.loader {
+  display: none;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.loader div {
+  position: absolute;
+  border: 4px solid #fff;
+  opacity: 1;
+  border-radius: 50%;
+  animation: loader 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+.loader div:nth-child(2) {
+  animation-delay: -0.5s;
+}
+
+@keyframes loader {
+  0% {
+    top: 36px;
+    left: 36px;
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    top: 0px;
+    left: 0px;
+    width: 72px;
+    height: 72px;
+    opacity: 0;
+  }
+}
+
 /* Responsive */
 @media screen and (max-width: 630px) {
   .main {
@@ -263,6 +305,7 @@ strong {
   .form {
     flex-direction: column;
     align-items: center;
+    flex-wrap: wrap;
   }
 
   .form > div {
@@ -280,3 +323,5 @@ strong {
     margin: 0;
   }
 }
+
+/* TODO: fade for Result */

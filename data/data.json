@@ -1,0 +1,29 @@
+{
+    "rules": {
+        "fft": "6.8",
+        "interest": "2.34",
+        "maximumLoanOfAsset": "80"
+    },
+    "vehicle": {
+        "loan": {
+            "minimum": "3000",
+            "maximum": "100000"
+        },
+        "installments": ["24", "36", "48"],
+        "collateral": {
+            "minimum": "5000",
+            "maximum": "3000000"
+        }
+    },
+    "home": {
+        "loan": {
+            "minimum": "30000",
+            "maximum": "4500000"
+        },
+        "installments": ["120", "180", "240"],
+        "collateral": {
+            "minimum": "50000",
+            "maximum": "100000000"
+        }
+    }
+}
