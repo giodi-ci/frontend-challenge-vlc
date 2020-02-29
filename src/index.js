@@ -3,7 +3,6 @@ import data from './../data/data.json'
 
 import { rangePercent, inputPercent, totalPayable, monthlyInstallment, checkInput } from './helper'
 
-// TODO: move this to a constructor?
 const assetOption = document.getElementById('collateral')
 const collateralMinimum = document.getElementById('collateral-minimum')
 const collateralMaximum = document.getElementById('collateral-maximum')
@@ -17,6 +16,7 @@ const installments = document.getElementById('installments')
 const monthlyResult = document.getElementById('monthly-result')
 const totalResult = document.getElementById('total-payable')
 const interestRate = document.getElementById('interest-rate')
+const loader = document.getElementById('loader')
 
 export const checkFormValidity = formElement => formElement.checkValidity()
 
@@ -56,8 +56,8 @@ export const getFormValues = formElement =>
 
 export const toStringFormValues = values => {
   const match = matchString => value => value.field === matchString
-  const IOF = 6.38 / 100
-  const INTEREST_RATE = 2.34 / 100
+  const IOF = 6.38 / 100 // these numbers are not the same found in data
+  const INTEREST_RATE = 2.34 / 100 // these numbers are not the same found in data
   const NUMBER_OF_INSTALLMENTS = values.find(match('installments')).value / 1000
   const VEHICLE_LOAN_AMOUNT = values.find(match('loan-amount')).value
 
@@ -78,6 +78,29 @@ export function Send (values) {
   })
 }
 
+export function fetchResponse (path, callback) {
+  var httpRequest = new XMLHttpRequest()
+  httpRequest.onreadystatechange = function () {
+    if (httpRequest.readyState === 4) {
+      if (httpRequest.status === 200) {
+        var data = httpRequest.responseText
+        if (callback) callback(data)
+      }
+    }
+  }
+  httpRequest.open('GET', path)
+  httpRequest.send()
+}
+
+export function getResponse () {
+  let messages
+  fetchResponse('./../data/helpService.js', function (data) {
+    messages = data
+  })
+
+  return messages
+}
+
 export function Submit (formElement) {
   formElement.addEventListener('submit', function (event) {
     event.preventDefault()
@@ -90,8 +113,42 @@ export function Submit (formElement) {
 }
 
 export function Help (element) {
-  element.addEventListener('click', function (event) {
-    window.alert('Display here the help text')
+  let question
+
+  element.addEventListener('click', (e) => {    
+    loader.style.display = 'inline-block'
+    e.target.style.display = 'none'
+  
+    window.fetch('http://localhost:4000/api/question')
+      .then(response => response.json())
+      .then((response, error) => {
+        if (error) {
+          return new Error(error)
+        } else {
+          question = response.text
+          return window.fetch('http://localhost:4000/api/answer')
+        }
+      })
+      .catch((error) => {
+        displayErrorMessage(error)
+      })
+      .then(response => response.json())
+      .then(myAnswer => displayHelpText(myAnswer.text))
+
+    function displayHelpText (answer) {
+      e.target.style.display = 'inline'
+      loader.style.display = 'none'
+
+      if (!question || !answer) return
+      
+      window.alert(`${question} ${answer}`)
+    }
+
+    function displayErrorMessage (message) {
+      e.target.style.display = 'inline'
+      loader.style.display = 'none'
+      window.alert(message)
+    }
   })
 }
 
@@ -193,7 +250,6 @@ export default class CreditasChallenge {
   static registerEvents () {
     Submit(document.querySelector('.form'))
 
-    // TODO: implement Help response
     Help(document.getElementById('help'))
 
     handleChangeAsset(assetOption)
