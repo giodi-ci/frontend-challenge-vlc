@@ -37,5 +37,3 @@ export function checkInput (value) {
 
   return onlyNumber.test(value)
 }
-
-// TODO: format number for input, range, and totalPayable eg. 100,000.00

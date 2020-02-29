@@ -24,7 +24,7 @@ const submitButton = document.querySelector('.form')
 const helpButton = document.getElementById('help')
 
 /**
- * Model
+ * Data model control
  */
 const checkFormValidity = formElement => formElement.checkValidity()
 
@@ -107,7 +107,7 @@ function Help (element) {
   element.addEventListener('click', (e) => {    
     loader.style.display = 'inline-block'
     e.target.style.display = 'none'
-  
+
     window.fetch('http://localhost:4000/api/question')
       .then(response => response.json())
       .then((response, error) => {
@@ -129,7 +129,7 @@ function Help (element) {
       loader.style.display = 'none'
 
       if (!question || !answer) return
-      
+
       window.alert(`${question} ${answer}`)
     }
 
