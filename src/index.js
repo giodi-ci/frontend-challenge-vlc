@@ -3,6 +3,9 @@ import data from './../data/data.json'
 
 import { rangePercent, inputPercent, totalPayable, monthlyInstallment, checkInput } from './helper'
 
+/**
+ * DOM Elements
+ */
 const assetOption = document.getElementById('collateral')
 const collateralMinimum = document.getElementById('collateral-minimum')
 const collateralMaximum = document.getElementById('collateral-maximum')
@@ -17,16 +20,21 @@ const monthlyResult = document.getElementById('monthly-result')
 const totalResult = document.getElementById('total-payable')
 const interestRate = document.getElementById('interest-rate')
 const loader = document.getElementById('loader')
+const submitButton = document.querySelector('.form')
+const helpButton = document.getElementById('help')
 
-export const checkFormValidity = formElement => formElement.checkValidity()
+/**
+ * Model
+ */
+const checkFormValidity = formElement => formElement.checkValidity()
 
-export function getUserSelection (element) {
+function getUserSelection (element) {
   const { selectedIndex } = element.options
 
   return element.options[selectedIndex].value
 }
 
-export function inputChecker (input, minimum, maximum) {
+function inputChecker (input, minimum, maximum) {
   const inputIsANumber = checkInput(input.value)
   let rangePercent
 
@@ -39,14 +47,14 @@ export function inputChecker (input, minimum, maximum) {
   return { inputIsANumber, rangePercent }
 }
 
-export function getAssetData () {
+function getAssetData () {
   const selection = getUserSelection(assetOption)
   const dataAsset = data[selection]
 
   return dataAsset
 }
 
-export const getFormValues = formElement =>
+const getFormValues = formElement =>
   Object.values(formElement.elements)
     .filter(element => ['SELECT', 'INPUT'].includes(element.nodeName))
     .map(element => ({
@@ -54,7 +62,7 @@ export const getFormValues = formElement =>
       value: element.value
     }))
 
-export const toStringFormValues = values => {
+const toStringFormValues = values => {
   const match = matchString => value => value.field === matchString
   const IOF = 6.38 / 100 // these numbers are not the same found in data
   const INTEREST_RATE = 2.34 / 100 // these numbers are not the same found in data
@@ -68,7 +76,11 @@ export const toStringFormValues = values => {
   )
 }
 
-export function Send (values) {
+/**
+ * Events
+ */
+
+function Send (values) {
   return new Promise((resolve, reject) => {
     try {
       resolve(toStringFormValues(values))
@@ -78,30 +90,7 @@ export function Send (values) {
   })
 }
 
-export function fetchResponse (path, callback) {
-  var httpRequest = new XMLHttpRequest()
-  httpRequest.onreadystatechange = function () {
-    if (httpRequest.readyState === 4) {
-      if (httpRequest.status === 200) {
-        var data = httpRequest.responseText
-        if (callback) callback(data)
-      }
-    }
-  }
-  httpRequest.open('GET', path)
-  httpRequest.send()
-}
-
-export function getResponse () {
-  let messages
-  fetchResponse('./../data/helpService.js', function (data) {
-    messages = data
-  })
-
-  return messages
-}
-
-export function Submit (formElement) {
+function Submit (formElement) {
   formElement.addEventListener('submit', function (event) {
     event.preventDefault()
     if (checkFormValidity(formElement)) {
@@ -112,7 +101,7 @@ export function Submit (formElement) {
   })
 }
 
-export function Help (element) {
+function Help (element) {
   let question
 
   element.addEventListener('click', (e) => {    
@@ -152,13 +141,13 @@ export function Help (element) {
   })
 }
 
-export function handleChangeAsset (asset) {
+function handleChangeAsset (asset) {
   asset.addEventListener('change', (e) => {
     updateView(getAssetData())
   })
 }
 
-export function handleChangeRangeWarranty (
+function handleChangeRangeWarranty (
   assetWarrantyRange,
   assetWarrantyInput
 ) {
@@ -177,7 +166,7 @@ export function handleChangeRangeWarranty (
   })
 }
 
-export function handleChangeLoanAmount (
+function handleChangeLoanAmount (
   loanAmountRangeElement,
   loanAmountElement
 ) {
@@ -196,7 +185,7 @@ export function handleChangeLoanAmount (
   })
 }
 
-export function handleChangeToShowResult (inputs) {
+function handleChangeToShowResult (inputs) {
   inputs.forEach((input) => {
     input.addEventListener('change', () => {
       updateResult(input)
@@ -204,7 +193,10 @@ export function handleChangeToShowResult (inputs) {
   })
 }
 
-export function updateResult () {
+/**
+ * View update
+ */
+function updateResult () {
   const { fft, interest } = data.rules
   const currentInstallments = getUserSelection(installments)
   const currentLoanAmount = loanInput.value
@@ -215,7 +207,7 @@ export function updateResult () {
   totalResult.innerHTML = total
 }
 
-export function updateView (newValues) {
+function updateView (newValues) {
   collateralMinimum.innerText = newValues.collateral.minimum
   collateralMaximum.innerText = newValues.collateral.maximum
   loanMinimum.innerText = newValues.loan.minimum
@@ -248,9 +240,9 @@ export default class CreditasChallenge {
   }
 
   static registerEvents () {
-    Submit(document.querySelector('.form'))
+    Submit(submitButton)
 
-    Help(document.getElementById('help'))
+    Help(helpButton)
 
     handleChangeAsset(assetOption)
 
