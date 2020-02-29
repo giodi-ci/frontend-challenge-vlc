@@ -11,6 +11,7 @@
   --white: #fff;
   --silver: #ccc;
   --tom-thumb: #2a492f;
+  --red: #c6868a;
   --header: 80px;
   --footer: 30px;
 }
@@ -249,6 +250,12 @@ strong {
   font-size: 1rem;
   font-weight: 100;
   text-align: center;
+}
+
+/* State */
+.field input[type="text"].js-value-incorrect {
+  border: 1px solid var(--red);
+  outline: none;
 }
 
 /* Responsive */

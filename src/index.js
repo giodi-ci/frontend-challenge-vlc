@@ -1,9 +1,9 @@
 import './styles.css'
 import data from './../data/data.json'
 
-import { rangePercent, totalPayable, monthlyInstallment } from './helper'
+import { rangePercent, totalPayable, monthlyInstallment, checkInput } from './helper'
 
-// TODO: move this to constructor?
+// TODO: move this to a constructor?
 const assetOption = document.getElementById('collateral')
 const collateralMinimum = document.getElementById('collateral-minimum')
 const collateralMaximum = document.getElementById('collateral-maximum')
@@ -18,28 +18,25 @@ const monthlyResult = document.getElementById('monthly-result')
 const totalResult = document.getElementById('total-payable')
 const interestRate = document.getElementById('interest-rate')
 
-// TODO: add checker for inputs
 export const checkFormValidity = formElement => formElement.checkValidity()
 
-export function updateView (newValues) {
-  collateralMinimum.innerText = newValues.collateral.minimum
-  collateralMaximum.innerText = newValues.collateral.maximum
-  loanMinimum.innerText = newValues.loan.minimum
-  loanMaximum.innerText = newValues.loan.maximum
+export function getUserSelection (element) {
+  const { selectedIndex } = element.options
 
-  installments.options.length = 0
-  newValues.installments.forEach((option) => {
-    let optionDOM = document.createElement('option')
-    optionDOM.value = option
-    optionDOM.innerHTML = option
-    installments.appendChild(optionDOM)
-  })
-
-  updateResult()
+  return element.options[selectedIndex].value
 }
 
-export function getAssetData (selection) {
+export function inputChecker (input) {
+  const inputIsANumber = checkInput(input.value)
+  inputIsANumber ? input.className = '' : input.className = 'js-value-incorrect'
+
+  return inputIsANumber
+}
+
+export function getAssetData () {
+  const selection = getUserSelection(assetOption)
   const dataAsset = data[selection]
+
   return dataAsset
 }
 
@@ -91,72 +88,43 @@ export function Help (element) {
     window.alert('Display here the help text')
   })
 }
-// TODO: double check if needed
-export function fetchJSONFile (path, callback) {
-  var httpRequest = new XMLHttpRequest()
-  httpRequest.onreadystatechange = function () {
-    if (httpRequest.readyState === 4) {
-      if (httpRequest.status === 200) {
-        var data = JSON.parse(httpRequest.responseText)
-        if (callback) callback(data)
-      }
-    }
-  }
-  httpRequest.open('GET', path)
-  httpRequest.send()
-}
-
-export function getDataAsset (asset) {
-  fetchJSONFile('./../data/data.json', function (data) {
-    return data[asset]
-  })
-  
-  const dataAsset = data[asset]
-
-  return dataAsset
-}
 
 export function handleChangeAsset (asset) {
   asset.addEventListener('change', (e) => {
-    const { selectedIndex } = e.target.options
-    const assetChosen = e.target.options[selectedIndex].value
-
-    updateView(getDataAsset(assetChosen))
+    updateView(getAssetData())
   })
-}
-
-export function getSelectedInstallments () {
-  const { selectedIndex } = installments.options
-
-  return installments.options[selectedIndex].value
-}
-
-export function getSelectedAsset () {
-  const { selectedIndex } = assetOption.options
-
-  return assetOption.options[selectedIndex].value
 }
 
 export function handleChangeRangeWarranty (
-  warrantyRangeElement,
-  assetWarrantyElement
+  assetWarrantyRange,
+  assetWarrantyInput
 ) {
-  // TODO: update input on change slider range
-  warrantyRangeElement.addEventListener('change', function (event) {
-    const { minimum, maximum } = getAssetData(getSelectedAsset()).collateral
-    assetWarrantyElement.value = rangePercent(minimum, maximum, event.target.value)
+  assetWarrantyRange.addEventListener('change', (e) => {
+    const { minimum, maximum } = getAssetData().collateral
+    assetWarrantyInput.value = rangePercent(minimum, maximum, e.target.value)
   })
+
+  assetWarrantyInput.addEventListener('input', (e) => {
+    if (inputChecker(e.target)) {
+      // TODO: update range percent
+    }
+  }) 
 }
 
 export function handleChangeLoanAmount (
   loanAmountRangeElement,
   loanAmountElement
 ) {
-  // TODO: update input on change slider range
   loanAmountRangeElement.addEventListener('change', function (event) {
-    const { minimum, maximum } = getAssetData(getSelectedAsset()).loan
+    const { minimum, maximum } = getAssetData().loan
     // TODO: loan max value shouldn't be > collateral value
     loanAmountElement.value = rangePercent(minimum, maximum, event.target.value)
+  })
+
+  loanAmountElement.addEventListener('input', (e) => {
+    if (inputChecker(e.target)) {
+      // TODO: update range percent
+    }
   })
 }
 
@@ -170,7 +138,7 @@ export function handleChangeToShowResult (inputs) {
 
 export function updateResult () {
   const { fft, interest } = data.rules
-  const currentInstallments = getSelectedInstallments()
+  const currentInstallments = getUserSelection(installments)
   const currentLoanAmount = loanInput.value
   const total = totalPayable(fft, interest, currentInstallments, currentLoanAmount)
   const monthly = monthlyInstallment(total, currentInstallments)
@@ -179,12 +147,36 @@ export function updateResult () {
   totalResult.innerHTML = total
 }
 
+export function updateView (newValues) {
+  collateralMinimum.innerText = newValues.collateral.minimum
+  collateralMaximum.innerText = newValues.collateral.maximum
+  loanMinimum.innerText = newValues.loan.minimum
+  loanMaximum.innerText = newValues.loan.maximum
+
+  installments.options.length = 0
+  newValues.installments.forEach((option) => {
+    let optionDOM = document.createElement('option')
+    optionDOM.value = option
+    optionDOM.innerHTML = option
+    installments.appendChild(optionDOM)
+  })
+
+  updateResult()
+}
+
 export default class CreditasChallenge {
   static initialize () {
-    // TODO: move it to addDataValue()
-    // TODO: add span range and totalPayable
-    interestRate.innerHTML = `${data.rules.interest}%`
+    this.elementsInitialValues()
     this.registerEvents()
+  }
+  
+  static elementsInitialValues () {
+    interestRate.innerText = `${data.rules.interest}%`
+    collateralMinimum.innerText = getAssetData().collateral.minimum
+    collateralMaximum.innerText = getAssetData().collateral.maximum
+    loanMinimum.innerText = getAssetData().loan.minimum
+    loanMaximum.innerText = getAssetData().loan.maximum
+    updateResult()
   }
 
   static registerEvents () {

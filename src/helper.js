@@ -6,12 +6,20 @@ export function rangePercent (minimum, maximum, percent) {
 
 export function totalPayable (FTT, interestRate, numberOfInstallments, loanAmount) {
   const totalPayableCalc = ((Number(FTT) / 100) + (Number(interestRate) / 100) + (Number(numberOfInstallments) / 1000) + 1) * Number(loanAmount)
+  
   return totalPayableCalc.toFixed(2)
 }
 
 export function monthlyInstallment (totalPayable, numberOfInstallments) {
   const monthlyInstallmentCalc = totalPayable / Number(numberOfInstallments)
+
   return monthlyInstallmentCalc.toFixed(2)
+}
+
+export function checkInput (value) {
+  const onlyNumber = /^\d+$/
+
+  return onlyNumber.test(value)
 }
 
 // TODO: format number for input, range, and totalPayable eg. 100,000.00
