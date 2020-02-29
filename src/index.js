@@ -34,6 +34,13 @@ function getUserSelection (element) {
   return element.options[selectedIndex].value
 }
 
+function getAssetData () {
+  const selection = getUserSelection(assetOption)
+  const dataAsset = data[selection]
+
+  return dataAsset
+}
+
 function inputChecker (input, minimum, maximum) {
   const inputIsANumber = checkInput(input.value)
   let rangePercent
@@ -45,13 +52,6 @@ function inputChecker (input, minimum, maximum) {
   inputIsANumber && rangePercent >= 0 ? input.className = '' : input.className = 'js-value-incorrect'
 
   return { inputIsANumber, rangePercent }
-}
-
-function getAssetData () {
-  const selection = getUserSelection(assetOption)
-  const dataAsset = data[selection]
-
-  return dataAsset
 }
 
 const getFormValues = formElement =>
@@ -104,7 +104,7 @@ function Submit (formElement) {
 function Help (element) {
   let question
 
-  element.addEventListener('click', (e) => {    
+  element.addEventListener('click', (e) => {
     loader.style.display = 'inline-block'
     e.target.style.display = 'none'
 
@@ -194,7 +194,7 @@ function handleChangeToShowResult (inputs) {
 }
 
 /**
- * View update
+ * Update view
  */
 function updateResult () {
   const { fft, interest } = data.rules
