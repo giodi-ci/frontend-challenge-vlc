@@ -27,14 +27,25 @@ import CreditasChallenge, {
   getFormValues,
   toStringFormValues,
   Send,
-  Submit
+  Submit,
+  getUserSelection
 } from '../src/index'
+
+import { 
+  rangePercent,
+  inputPercent,
+  checkInput
+} from '../src/helper'
 
 function initializeAppMock () {
   document.body.innerHTML = `
     <form class="form" data-testid="form">
       <label for="collateral-value">Collateral Amount</label>
       <input id="collateral-value" required />
+      <select name="collateral" id="collateral-select" required>
+        <option value="vehicle" selected="selected">Vehicle</option>
+        <option value="home">Home</option>
+      </select>
       <button type="button"></button>
     </form>
   `
@@ -57,12 +68,14 @@ describe('Creditas Challenge', () => {
     it('should return true when form has valid', () => {
       const form = document.querySelector('.form')
       const input = document.querySelector('input')
-      input.value = 10      
+      input.value = 10
+
       expect(checkFormValidity(form)).toBeTruthy()
     })
 
     it('should return false when form has not valid', () => {
       const form = document.querySelector('.form')
+
       expect(checkFormValidity(form)).toBeFalsy()
     })
   })
@@ -77,7 +90,45 @@ describe('Creditas Challenge', () => {
   describe('Method: Get form values', () => {
     it('should have length', () => {
       const form = document.querySelector('.form')
-      expect(getFormValues(form)).toHaveLength(1)
+
+      expect(getFormValues(form)).toHaveLength(2)
+    })
+  })
+  
+  describe('Method: Get selected element', () => {
+    it('should return selected value', () => {
+      const selection = document.getElementById('collateral-select')
+
+      expect(getUserSelection(selection)).toBe('vehicle')
+    })
+  })
+
+  describe('Helper method: from percent to number given max and min', () => {
+    it('should return corresponding float number in range', () => {
+      const min = 100;
+      const max = 5000;
+      const percent = 35;
+  
+      expect(rangePercent(min, max, percent)).toEqual(1815)
+    })
+  })
+  
+  describe('Helper method: from number to percent given max and min', () => {
+    it('should return corresponding percentage in range', () => {
+      const min = 500;
+      const max = 2000;
+      const value = 1250;
+  
+      expect(inputPercent(min, max, value)).toEqual(50)
+    })
+  })
+  
+  describe('Helper method: check input value only have numbers', () => {
+    it('should return false', () => {
+      const input = document.querySelector('input')
+      input.value = 'test10'
+
+      expect(checkInput(input)).toBeFalsy()
     })
   })
 })
