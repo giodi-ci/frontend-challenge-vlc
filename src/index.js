@@ -28,7 +28,7 @@ const helpButton = document.getElementById('help')
  */
 export const checkFormValidity = formElement => formElement.checkValidity()
 
-function getUserSelection (element) {
+export function getUserSelection (element) {
   const { selectedIndex } = element.options
 
   return element.options[selectedIndex].value
