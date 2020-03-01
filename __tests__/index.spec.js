@@ -57,7 +57,7 @@ describe('Creditas Challenge', () => {
     it('should return true when form has valid', () => {
       const form = document.querySelector('.form')
       const input = document.querySelector('input')
-      input.value = 10
+      input.value = 10      
       expect(checkFormValidity(form)).toBeTruthy()
     })
 
@@ -69,8 +69,15 @@ describe('Creditas Challenge', () => {
 
   describe('Method: Submit', () => {
     it('should add event listener to submit data form', () => {
-      const container = document.querySelector('.form')
-      Submit(container)
+      const form = document.querySelector('.form')
+      Submit(form)
+    })
+  })
+
+  describe('Method: Get form values', () => {
+    it('should have length', () => {
+      const form = document.querySelector('.form')
+      expect(getFormValues(form)).toHaveLength(1)
     })
   })
 })
