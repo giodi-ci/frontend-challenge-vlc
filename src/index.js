@@ -26,7 +26,7 @@ const helpButton = document.getElementById('help')
 /**
  * Data model control
  */
-const checkFormValidity = formElement => formElement.checkValidity()
+export const checkFormValidity = formElement => formElement.checkValidity()
 
 function getUserSelection (element) {
   const { selectedIndex } = element.options
@@ -54,7 +54,7 @@ function inputChecker (input, minimum, maximum) {
   return { inputIsANumber, rangePercent }
 }
 
-const getFormValues = formElement =>
+export const getFormValues = formElement =>
   Object.values(formElement.elements)
     .filter(element => ['SELECT', 'INPUT'].includes(element.nodeName))
     .map(element => ({
@@ -62,7 +62,7 @@ const getFormValues = formElement =>
       value: element.value
     }))
 
-const toStringFormValues = values => {
+export const toStringFormValues = values => {
   const match = matchString => value => value.field === matchString
   const IOF = 6.38 / 100 // these numbers are not the same found in data
   const INTEREST_RATE = 2.34 / 100 // these numbers are not the same found in data
@@ -79,8 +79,7 @@ const toStringFormValues = values => {
 /**
  * Events
  */
-
-function Send (values) {
+export function Send (values) {
   return new Promise((resolve, reject) => {
     try {
       resolve(toStringFormValues(values))
@@ -90,7 +89,7 @@ function Send (values) {
   })
 }
 
-function Submit (formElement) {
+export function Submit (formElement) {
   formElement.addEventListener('submit', function (event) {
     event.preventDefault()
     if (checkFormValidity(formElement)) {
@@ -147,41 +146,28 @@ function handleChangeAsset (asset) {
   })
 }
 
-function handleChangeRangeWarranty (
-  assetWarrantyRange,
-  assetWarrantyInput
+function handleRanges (
+  ranges, inputs
 ) {
-  assetWarrantyRange.addEventListener('change', (e) => {
-    const { minimum, maximum } = getAssetData().collateral
-    assetWarrantyInput.value = rangePercent(minimum, maximum, e.target.value)
+  const categories = ['collateral', 'loan']
+  const dataAsset = getAssetData()
+
+  ranges.forEach((range, index) => {
+    range.addEventListener('change', function (event) {
+      const { minimum, maximum } = dataAsset[categories[index]]
+      inputs[index].value = rangePercent(minimum, maximum, event.target.value)
+    })
   })
 
-  assetWarrantyInput.addEventListener('input', (e) => {
-    const { minimum, maximum } = getAssetData().collateral
-    const { inputIsANumber, rangePercent } = inputChecker(e.target, minimum, maximum)
+  inputs.forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+      const { minimum, maximum } = dataAsset[categories[index]]
+      const { inputIsANumber, rangePercent } = inputChecker(e.target, minimum, maximum)
 
-    if (inputIsANumber) {
-      assetWarrantyRange.value = rangePercent
-    }
-  })
-}
-
-function handleChangeLoanAmount (
-  loanAmountRangeElement,
-  loanAmountElement
-) {
-  loanAmountRangeElement.addEventListener('change', function (event) {
-    const { minimum, maximum } = getAssetData().loan
-    loanAmountElement.value = rangePercent(minimum, maximum, event.target.value)
-  })
-
-  loanAmountElement.addEventListener('input', (e) => {
-    const { minimum, maximum } = getAssetData().loan
-    const { inputIsANumber, rangePercent } = inputChecker(e.target, minimum, maximum)
-
-    if (inputIsANumber) {
-      loanAmountRangeElement.value = rangePercent
-    }
+      if (inputIsANumber) {
+        ranges[index].value = rangePercent
+      }
+    })
   })
 }
 
@@ -246,14 +232,9 @@ export default class CreditasChallenge {
 
     handleChangeAsset(assetOption)
 
-    handleChangeRangeWarranty(
-      collateralRange,
-      collateralInput
-    )
-
-    handleChangeLoanAmount(
-      loanRange,
-      loanInput
+    handleRanges(
+      [ collateralRange, loanRange ],
+      [ collateralInput, loanInput ]
     )
 
     handleChangeToShowResult(
